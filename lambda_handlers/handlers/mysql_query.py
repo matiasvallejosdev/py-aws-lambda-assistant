@@ -1,7 +1,8 @@
+import asyncio
 
 class mysql_query():
     def execute_select(self, conn, sql):
-        self.result = []
+        result = []
         response = []
         count = 0
 
@@ -16,6 +17,32 @@ class mysql_query():
 
         # Commit changes           
         conn.commit()
-        self.result.append(count)
-        self.result.append(response)
-        return self.result
+        result.append(count)
+        result.append(response)
+        return result
+
+    def execute_delete(self, conn, sql, sql_recheckidentity):
+        result = []
+
+        # Execute SQL command
+        with conn.cursor() as cur:
+            cur.execute(sql)
+            cur.execute(sql_recheckidentity)
+
+        # Commit changes    
+        conn.commit()        
+        return result
+
+    def execute_insert(self, conn, sql, get_id=False):
+        result = []
+
+        # Execute SQL command
+        with conn.cursor() as cur:
+            cur.execute(sql)
+            if get_id:
+                id = int(cur.lastrowid)
+                result.append(id)
+
+        # Commit changes    
+        conn.commit()
+        return result

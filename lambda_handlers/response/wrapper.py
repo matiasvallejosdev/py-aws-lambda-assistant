@@ -20,7 +20,7 @@ def buildResponse(operation, data, count, lambdaError=None):
             return APIGatewayProxyResult(
                 HTTPStatus=lambdaError['statusCode'], 
                 Headers=headers.buildHeaders(), 
-                Body=buildBody(operation=operation, response=lambdaError, count=count)
+                Body=buildBody(operation=operation, response=lambdaError['error'], count=count)
                 )
     except:
         # If have an internal server error reported
@@ -28,7 +28,7 @@ def buildResponse(operation, data, count, lambdaError=None):
         return APIGatewayProxyResult(
                 HTTPStatus=lambdaError['statusCode'], 
                 Headers=headers.buildHeaders(), 
-                Body=buildBody(operation="NULL /forgotten", response=lambdaError, count=0)
+                Body=buildBody(operation="NULL /forgotten", response=lambdaError['error'], count=0)
                 )    
 
 def buildBody(operation, response, count):

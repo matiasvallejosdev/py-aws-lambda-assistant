@@ -55,11 +55,9 @@ class TestResponseBuilder:
             HTTPStatus.NOT_FOUND.value, 
             Headers().buildHeaders(), 
             buildBody("GET", {
-                    'statusCode': HTTPStatus.NOT_FOUND.value,
-                    'error': {
                         'message': HTTPStatus.NOT_FOUND.description,
                         'type': 'notFound'
-                    }}, 
+                    }, 
                     0),
             notFound().toLambda(),
             expected_lambda_error(notFound())
@@ -69,11 +67,9 @@ class TestResponseBuilder:
             HTTPStatus.BAD_REQUEST.value, 
             Headers().buildHeaders(), 
             buildBody("GET", {
-                    'statusCode': HTTPStatus.BAD_REQUEST.value,
-                    'error': {
                         'message': HTTPStatus.BAD_REQUEST.description,
                         'type': 'deleteDataFailed'
-                    }}, 
+                    }, 
                     0),
             deleteDataFailed().toLambda(),
             expected_lambda_error(deleteDataFailed())
@@ -83,11 +79,9 @@ class TestResponseBuilder:
             HTTPStatus.INTERNAL_SERVER_ERROR.value, 
             Headers().buildHeaders(), 
             buildBody("NULL /forgotten", {
-                    'statusCode': HTTPStatus.INTERNAL_SERVER_ERROR.value,
-                    'error': {
                         'message': HTTPStatus.INTERNAL_SERVER_ERROR.description,
                         'type': 'internalError'
-                    }}, 
+                    }, 
                     0),
             internalError().toLambda(),
             internal_error(internalError())

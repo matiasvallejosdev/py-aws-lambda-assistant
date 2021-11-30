@@ -23,6 +23,11 @@ def internalError():
     error.message = HTTPStatus.INTERNAL_SERVER_ERROR.description
     return error
 
+def sqlError():
+    error = LambdaError(HTTPStatus.BAD_REQUEST.value, HTTPStatus.BAD_REQUEST.description, 'sqlQueryError')
+    error.message = HTTPStatus.BAD_REQUEST.description
+    return error
+
 def notFound():
     error = LambdaError(HTTPStatus.NOT_FOUND.value, HTTPStatus.NOT_FOUND.description, 'notFound')
     error.message = HTTPStatus.NOT_FOUND.description
