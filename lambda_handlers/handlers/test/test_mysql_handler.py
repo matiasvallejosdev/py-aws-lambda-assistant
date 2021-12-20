@@ -2,10 +2,10 @@ import pytest
 import pymysql
 import json
 
-from lambda_handlers.handlers.mysql_handler import MySqlHandler
+from lambda_handlers.handlers.mysql_client import MySqlHandler
 from lambda_handlers.handlers.lambda_handler import LambdaHandler
 
-PATH_JSON = r'C:\Users\matia\Desktop\MATIAS A. VALLEJOS\Github\Github.Work\MiRegistro\Project.Backend\API\config\config.json'
+PATH_JSON = r'C:\Users\matia\Desktop\Matias A. Vallejos\Github\Github.Work\MR-miregistro\miregistro-backend\src\backend\config\mysql_config.json'
 
 class TestMySqlHandler:
     @pytest.fixture()
