@@ -1,7 +1,17 @@
-import asyncio
+import pymysql
 
-class mysql_query():
-    def execute_select(self, conn, sql):
+class MySqlHandler():
+    def __init__(self, db_name, rds_host, db_username, db_password):
+        self.rds_host = rds_host
+        self.db_name = db_name
+        self.db_username = db_username
+        self.db_password = db_password
+
+    def Connect(self):
+        conn = pymysql.connect(host=self.rds_host, user=self.db_username, passwd=self.db_password, db=self.db_name, connect_timeout=5)
+        return conn  
+    
+    def Select(self, conn, sql):
         result = []
         response = []
         count = 0
@@ -21,7 +31,7 @@ class mysql_query():
         result.append(response)
         return result
 
-    def execute_delete(self, conn, sql, sql_recheckidentity):
+    def Delete(self, conn, sql, sql_recheckidentity):
         result = []
 
         # Execute SQL command
@@ -33,7 +43,7 @@ class mysql_query():
         conn.commit()        
         return result
 
-    def execute_insert(self, conn, sql, get_id=False):
+    def Insert(self, conn, sql, get_id=False):
         result = []
 
         # Execute SQL command
