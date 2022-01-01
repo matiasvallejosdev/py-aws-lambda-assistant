@@ -1,43 +1,48 @@
-from http import HTTPStatus
 import pytest
+from http import HTTPStatus
+
 from lambda_handlers.response.headers import Headers
 from lambda_handlers.response.wrapper import *
-from lambda_handlers.errors import LambdaError, internalError, notFound, putDataFailed, getDataFailed, deleteDataFailed, conflictConnection
+from lambda_handlers.errors import *
 
-# Wrapper for tests
-def ok():
-    """Return a response with OK status code."""
-    return buildResponse(operation="GET", data={}, count=0, lambdaError=None)
+# Wrapper expected for tests
+def expected_success():
+    return APIGatewayProxyResult(
+                HTTPStatus=200, 
+                Headers=Headers().buildHeaders(), 
+                Body=buildBody(operation="GET", response={})
+                )
 
-def expected_lambda_error(err):
-    """Return a response with LAMBDA ERROR status code."""
-    lambdaError = err.toLambda()
-    return buildResponse(operation="GET", data={}, count=0, lambdaError=lambdaError)
-
-def internal_error(err):
-    """Return a response with INTERNAL ERROR status code."""
-    lambdaError = err.toLambda()
-    return buildResponse(operation="NULL /forgotten", data={}, count=0, lambdaError=lambdaError)
-
+def expected_lambda_error(operation, error):
+    lambdaErrorJson = error.toJson()
+    return APIGatewayProxyResult(
+                HTTPStatus=lambdaErrorJson['statusCode'], 
+                Headers=Headers().buildHeaders(), 
+                Body=buildBody(operation=operation, response=lambdaErrorJson['error'])
+                )
+    
 class TestResponseBuilder:
-    #'statusCode': 200, 
-    #'headers': {'Headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}}, 
-    #'body': '{"Operation": "GET /tramites", "Count": 1, 
-    #"Response": [[2182, "AE343FG", "Modificacion Prenda", "No"]]}'}
 
-    # TEST WITHOUT LAMBDA.
+    """
+    Test wrapper response APIGatewayProxyResult with lambda errors and without errors
+        - 'statusCode': 200, 
+        - 'headers': {'Headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}}, 
+        - 'body': '{"Operation": "GET /tramites", "Response": [[2182, "AE343FG", "Modificacion Prenda", "No"]]}'}
+    """
+
+    # Test lambda success
     @pytest.mark.parametrize(
         'operation, status_code, headers, body, expected',
         [
             ("GET",
             200, 
             Headers().buildHeaders(), 
-            json.dumps(buildBody("GET", {}, 0)),
-            ok())
+            json.dumps(buildBody("GET", {})),
+            expected_success())
         ],
     )
     def test_builder_without_lambda(self, operation, status_code, headers, body, expected):
-        response = buildResponse(operation=operation, data={}, count=0, lambdaError=None)
+        response = buildResponse(operation=operation, data={}, lambdaError=None)
         assert response == expected
         assert isinstance(response, APIGatewayProxyResult)
 
@@ -46,50 +51,51 @@ class TestResponseBuilder:
         assert response['Headers'] == headers
         assert response['Body'] == body
     
-    
-    # TEST WITH LAMBDA 
+
+    # Test with lambda errors 
     @pytest.mark.parametrize(
         'operation, status_code, headers, body, lambda_error_response, expected',
         [
             ("GET",
             HTTPStatus.NOT_FOUND.value, 
             Headers().buildHeaders(), 
-            buildBody("GET", {
+            {   'Operation': "GET", 
+                'Response': json.dumps({
                         'message': HTTPStatus.NOT_FOUND.description,
-                        'type': 'notFound'
-                    }, 
-                    0),
-            notFound().toLambda(),
-            expected_lambda_error(notFound())
-            ),
-            
+                        'type': 'notFoundError'
+                    })
+            },
+            LambdaError(NotFoundError()),
+            expected_lambda_error("GET", LambdaError(NotFoundError()))
+            ),  
             ("GET",
             HTTPStatus.BAD_REQUEST.value, 
             Headers().buildHeaders(), 
-            buildBody("GET", {
+            {   'Operation': "GET", 
+                'Response': json.dumps({
                         'message': HTTPStatus.BAD_REQUEST.description,
-                        'type': 'deleteDataFailed'
-                    }, 
-                    0),
-            deleteDataFailed().toLambda(),
-            expected_lambda_error(deleteDataFailed())
+                        'type': 'deleteDataFailedError'
+                    })
+            },
+            LambdaError(DeleteDataFailedError()),
+            expected_lambda_error("GET", LambdaError(DeleteDataFailedError()))
             ),
-
             ("NULL /forgotten",
             HTTPStatus.INTERNAL_SERVER_ERROR.value, 
             Headers().buildHeaders(), 
-            buildBody("NULL /forgotten", {
+            {   'Operation': "NULL /forgotten", 
+                'Response': json.dumps({
                         'message': HTTPStatus.INTERNAL_SERVER_ERROR.description,
-                        'type': 'internalError'
-                    }, 
-                    0),
-            internalError().toLambda(),
-            internal_error(internalError())
+                        'type': 'internalServerError'
+                    })
+            },
+            LambdaError(InternalServerError()),
+            expected_lambda_error("NULL /forgotten", LambdaError(InternalServerError()))
             )
         ],
     ) 
     def test_builder_with_lambda(self, operation, status_code, headers, body, lambda_error_response, expected):
-        response = buildResponse(operation=operation, data={}, count=0, lambdaError=lambda_error_response)
+        response = buildResponse(operation=operation, data={}, lambdaError=lambda_error_response)
         assert response == expected
         assert isinstance(response, APIGatewayProxyResult)
 
@@ -98,19 +104,30 @@ class TestResponseBuilder:
         assert response['Headers'] == headers
         assert response['Body'] == json.dumps(body)
     
-
+    # Test body wrapper
     @pytest.mark.parametrize(
-        'operation, count, body, expected',
+        'operation, body, expected',
         [
-            ("GET", 1, {}, buildBody(operation="GET", response={}, count=1)),
-            ("POST", 0, {}, buildBody(operation="POST", response={}, count=0))
+            ("GET", {}, {'Operation': "GET", 'Response': json.dumps({})}),
+            ("POST", {}, {'Operation': "POST", 'Response': json.dumps({})})
         ],
     )
-    def test_builder_body(self, operation, count, body, expected):
-        response = buildBody(operation, body, count)
+    def test_builder_body(self, operation, body, expected):
+        response = buildBody(operation, body)
         
-        assert response['Response'] == json.dumps(body)
-        assert response['Count'] == count
         assert response['Operation'] == operation
+        assert response['Response'] == json.dumps(body)
         assert response == expected
-
+     
+    # Test result wrapper
+    @pytest.mark.parametrize(
+        'result, expected',
+        [
+            ("RESULT_TEST", {'Result': "RESULT_TEST"})
+        ],
+    )
+    def test_build_result(self, result, expected):
+        response = buildResult(result)
+        
+        assert response['Result'] == expected['Result']
+        assert response == expected

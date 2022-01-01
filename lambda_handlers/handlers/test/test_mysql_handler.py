@@ -2,13 +2,14 @@ import pytest
 import pymysql
 import json
 
-from lambda_handlers.handlers.mysql_handler import MySqlHandler
-from lambda_handlers.handlers.lambda_handler import LambdaHandler
+from lambda_handlers.handlers.mysql_client import *
+from lambda_handlers.handlers.lambda_handler import *
 
-PATH_JSON = r'C:\Users\matia\Desktop\MATIAS A. VALLEJOS\Github\Github.Work\MiRegistro\Project.Backend\API\config\config.json'
+PATH_JSON = r'C:\Users\matia\Desktop\Matias A. Vallejos\Github\Github.Work\MR-miregistro\miregistro-backend\src\backend\config\mysql_config.json'
 
 class TestMySqlHandler:
-    @pytest.fixture()
+    """
+    @pytest.fixture
     def config(self):
         # Return JSON configuration file
         with open(PATH_JSON) as f:
@@ -29,7 +30,9 @@ class TestMySqlHandler:
     @pytest.fixture
     def cur(self, conn):
         return conn.cursor()
-
+    """
+    
+    @pytest.mark.skip(reason="No way of currently testing this")
     def test_mysql_connection_success(self, conn, cur):
         cur.execute("SELECT VERSION()")
         result = cur.fetchone()

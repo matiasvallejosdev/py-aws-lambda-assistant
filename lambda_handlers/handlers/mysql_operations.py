@@ -1,10 +1,9 @@
-import asyncio
+import pymysql
+from lambda_handlers.response.wrapper import buildResult
 
-class mysql_query():
-    def execute_select(self, conn, sql):
+class Select():
+    def Select(self, conn, sql):
         result = []
-        response = []
-        count = 0
 
         # Execute SQL command
         with conn.cursor() as cur:
@@ -12,16 +11,15 @@ class mysql_query():
             row_headers=[x[0] for x in cur.description] #this will extract row headers
             
             for row in cur:
-                count += 1
-                response.append(dict(zip(row_headers, row)))
+                result.append(dict(zip(row_headers, row)))
 
         # Commit changes           
         conn.commit()
-        result.append(count)
-        result.append(response)
-        return result
+        #result.append(count)
+        return buildResult(result)
 
-    def execute_delete(self, conn, sql, sql_recheckidentity):
+class Delete():
+    def Delete(self, conn, sql, sql_recheckidentity):
         result = []
 
         # Execute SQL command
@@ -31,9 +29,10 @@ class mysql_query():
 
         # Commit changes    
         conn.commit()        
-        return result
+        return buildResult(result)
 
-    def execute_insert(self, conn, sql, get_id=False):
+class Insert():
+    def Insert(self, conn, sql, get_id=False):
         result = []
 
         # Execute SQL command
@@ -45,4 +44,4 @@ class mysql_query():
 
         # Commit changes    
         conn.commit()
-        return result
+        return buildResult(result)

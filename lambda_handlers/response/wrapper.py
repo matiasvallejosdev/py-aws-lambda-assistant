@@ -1,11 +1,12 @@
-from lambda_handlers.errors import LambdaError, internalError, notFound
+import json
+
+from lambda_handlers.errors import *
 from lambda_handlers.types import *
 from lambda_handlers.response.headers import Headers
 from lambda_handlers.types import APIGatewayProxyResult
 
-import json
 
-def buildResponse(operation, data, count, lambdaError=None):
+def buildResponse(operation, data, lambdaError=None):
     try:
         headers = Headers()
         if lambdaError is None:
@@ -13,27 +14,32 @@ def buildResponse(operation, data, count, lambdaError=None):
             return APIGatewayProxyResult(
                 HTTPStatus=200, 
                 Headers=headers.buildHeaders(), 
-                Body=buildBody(operation=operation, response=data, count=count)
+                Body=buildBody(operation=operation, response=data)
                 )
         else:
+            lambdaErrorJson = lambdaError.toJson() 
             # If have a lambda error
             return APIGatewayProxyResult(
-                HTTPStatus=lambdaError['statusCode'], 
+                HTTPStatus=lambdaErrorJson['statusCode'], 
                 Headers=headers.buildHeaders(), 
-                Body=buildBody(operation=operation, response=lambdaError['error'], count=count)
+                Body=buildBody(operation=operation, response=lambdaErrorJson['error'])
                 )
     except:
         # If have an internal server error reported
-        lambdaError = internalError().toLambda()
+        lambdaErrorJson = LambdaError(error=InternalServerError()).toJson()
         return APIGatewayProxyResult(
-                HTTPStatus=lambdaError['statusCode'], 
+                HTTPStatus=lambdaErrorJson['statusCode'], 
                 Headers=headers.buildHeaders(), 
-                Body=buildBody(operation="NULL /forgotten", response=lambdaError['error'], count=0)
+                Body=buildBody(operation="NULL /forgotten", response=lambdaErrorJson['error'])
                 )    
 
-def buildBody(operation, response, count):
+def buildBody(operation, response):
         return {
         'Operation': operation,
-        'Count': count,
         'Response': json.dumps(response, sort_keys=True, default=str)
+        }
+
+def buildResult(result):
+        return {
+        'Result': result
         }
