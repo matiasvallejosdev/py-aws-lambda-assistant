@@ -1,5 +1,5 @@
 import pymysql
-from lambda_handlers.handlers.mysql_operations import *
+from lambda_handlers.handlers.mysql.mysql_operations import *
 
 class MySqlHandler(Select, Delete, Insert):
     def __init__(self, db_name, rds_host, db_username, db_password):

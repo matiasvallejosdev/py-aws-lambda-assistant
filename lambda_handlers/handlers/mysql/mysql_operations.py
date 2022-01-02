@@ -1,10 +1,10 @@
 import pymysql
-from lambda_handlers.response.wrapper import buildResult
+from lambda_handlers.response.wrapper import *
 
 class Select():
-    def Select(self, conn, sql):
+    def Select(self, conn: pymysql.connections.Connection, sql: str):
         result = []
-
+        
         # Execute SQL command
         with conn.cursor() as cur:
             cur.execute(sql)
@@ -14,12 +14,11 @@ class Select():
                 result.append(dict(zip(row_headers, row)))
 
         # Commit changes           
-        conn.commit()
-        #result.append(count)
+        conn.commit()  
         return buildResult(result)
 
 class Delete():
-    def Delete(self, conn, sql, sql_recheckidentity):
+    def Delete(self, conn:pymysql.connections.Connection, sql: str, sql_recheckidentity: str):
         result = []
 
         # Execute SQL command
@@ -32,7 +31,7 @@ class Delete():
         return buildResult(result)
 
 class Insert():
-    def Insert(self, conn, sql, get_id=False):
+    def Insert(self, conn: pymysql.connections.Connection, sql: str, get_id=False):
         result = []
 
         # Execute SQL command

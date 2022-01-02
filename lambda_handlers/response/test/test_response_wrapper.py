@@ -1,11 +1,15 @@
 import pytest
 from http import HTTPStatus
 
-from lambda_handlers.response.headers import Headers
 from lambda_handlers.response.wrapper import *
+from lambda_handlers.response.headers import Headers
 from lambda_handlers.errors import *
 
 # Wrapper expected for tests
+def handler_obj(error: LambdaError = None):
+    handler = LambdaHandler(event=None, context=None, lambdaError=error)
+    return handler
+
 def expected_success():
     return APIGatewayProxyResult(
                 HTTPStatus=200, 
@@ -13,8 +17,8 @@ def expected_success():
                 Body=buildBody(operation="GET", response={})
                 )
 
-def expected_lambda_error(operation, error):
-    lambdaErrorJson = error.toJson()
+def expected_lambda_error(operation, lambdaHandler: LambdaHandler):
+    lambdaErrorJson = lambdaHandler.lambdaError.toJson()
     return APIGatewayProxyResult(
                 HTTPStatus=lambdaErrorJson['statusCode'], 
                 Headers=Headers().buildHeaders(), 
@@ -22,7 +26,6 @@ def expected_lambda_error(operation, error):
                 )
     
 class TestResponseBuilder:
-
     """
     Test wrapper response APIGatewayProxyResult with lambda errors and without errors
         - 'statusCode': 200, 
@@ -31,30 +34,33 @@ class TestResponseBuilder:
     """
 
     # Test lambda success
+    # @pytest.mark.skip(reason="No way of currently testing this")
     @pytest.mark.parametrize(
-        'operation, status_code, headers, body, expected',
+        'operation, data, expected',
         [
             ("GET",
-            200, 
-            Headers().buildHeaders(), 
-            json.dumps(buildBody("GET", {})),
+            {},
             expected_success())
         ],
     )
-    def test_builder_without_lambda(self, operation, status_code, headers, body, expected):
-        response = buildResponse(operation=operation, data={}, lambdaError=None)
+    def test_builder_lambda_success(self, operation, data, expected):
+        lambdaHandler = LambdaHandler(event=None, context=None)
+        
+        response = buildResponse(operation=operation, data=data, lambdaHandler=lambdaHandler)
         assert response == expected
         assert isinstance(response, APIGatewayProxyResult)
 
         response = json.loads(response.asjson())
-        assert response['HTTPStatus'] == status_code
-        assert response['Headers'] == headers
-        assert response['Body'] == body
+        expected = json.loads(expected.asjson()
+                              )
+        assert response['HTTPStatus'] == expected['HTTPStatus']
+        assert response['Headers'] == expected['Headers']
+        assert response['Body'] == expected['Body']
     
 
     # Test with lambda errors 
     @pytest.mark.parametrize(
-        'operation, status_code, headers, body, lambda_error_response, expected',
+        'operation, status_code, headers, body, lambda_handler, expected',
         [
             ("GET",
             HTTPStatus.NOT_FOUND.value, 
@@ -65,8 +71,8 @@ class TestResponseBuilder:
                         'type': 'notFoundError'
                     })
             },
-            LambdaError(NotFoundError()),
-            expected_lambda_error("GET", LambdaError(NotFoundError()))
+            handler_obj(LambdaError(NotFoundError())),
+            expected_lambda_error("GET", handler_obj(LambdaError(NotFoundError())))
             ),  
             ("GET",
             HTTPStatus.BAD_REQUEST.value, 
@@ -77,8 +83,8 @@ class TestResponseBuilder:
                         'type': 'deleteDataFailedError'
                     })
             },
-            LambdaError(DeleteDataFailedError()),
-            expected_lambda_error("GET", LambdaError(DeleteDataFailedError()))
+            handler_obj(LambdaError(DeleteDataFailedError())),
+            expected_lambda_error("GET", handler_obj(LambdaError(DeleteDataFailedError())))
             ),
             ("NULL /forgotten",
             HTTPStatus.INTERNAL_SERVER_ERROR.value, 
@@ -89,13 +95,13 @@ class TestResponseBuilder:
                         'type': 'internalServerError'
                     })
             },
-            LambdaError(InternalServerError()),
-            expected_lambda_error("NULL /forgotten", LambdaError(InternalServerError()))
+            handler_obj(LambdaError(InternalServerError())),
+            expected_lambda_error("NULL /forgotten", handler_obj(LambdaError(InternalServerError())))
             )
         ],
     ) 
-    def test_builder_with_lambda(self, operation, status_code, headers, body, lambda_error_response, expected):
-        response = buildResponse(operation=operation, data={}, lambdaError=lambda_error_response)
+    def test_builder_with_lambda(self, operation, status_code, headers, body, lambda_handler: LambdaHandler, expected):
+        response = buildResponse(operation=operation, data={}, lambdaHandler=lambda_handler)
         assert response == expected
         assert isinstance(response, APIGatewayProxyResult)
 
