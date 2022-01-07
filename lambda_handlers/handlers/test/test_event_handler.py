@@ -23,7 +23,7 @@ class TestEventHandler:
         
         assert eventHandler.lambdaError is not None
         assert isinstance(eventHandler.lambdaError, LambdaError)
-        assert eventHandler.lambdaError.toJson() == {
+        assert eventHandler.lambdaError.toDict() == {
             'Error': {
                 'statusCode': 400,
                 'message': "Bad request syntax or unsupported method",

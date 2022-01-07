@@ -9,7 +9,7 @@ class LambdaError():
         self.type = error._type
         self.message = error._description
 
-    def toJson(self):
+    def toDict(self):
         return {
             'Error': {
                 'statusCode': self.statusCode,

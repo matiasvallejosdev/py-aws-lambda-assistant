@@ -4,7 +4,7 @@ from lambda_handlers.errors import *
 from lambda_handlers.handlers.event_handler import EventHandler
 from lambda_handlers.response import headers
 from lambda_handlers.response.headers import CORSHeaders
-from lambda_handlers.response.wrapper import buildResponse, buildBody
+from lambda_handlers.response.wrapper import buildResponse, buildLambdaBody
 from lambda_handlers.types import APIGatewayProxyResult
 
 class HTTPHandler():
@@ -17,16 +17,16 @@ class HTTPHandler():
                 body = func(*args, **kwargs) # body -> dict
                 if 'Error' in body['Response']:
                     # If has lambda error
-                    lambdaErrorJson = body['Response']['Error']
-                    return self._create_response(buildResponse(lambdaErrorJson['statusCode'], self.headers, body))
+                    lambdaErrorJson = json.loads(body['Response'])
+                    return self._create_response(buildResponse(lambdaErrorJson['Error']['statusCode'], self.headers, body))
                 if body is not None:
                     # If has OK
                     return self._create_response(buildResponse(200, self.headers, body))          
             except:
                 # If have an internal server error
-                lambdaErrorJson = LambdaError(InternalServerError()).toJson()
-                body = buildBody(operation="NULL /forgotten", response=lambdaErrorJson['Error'])
-                return self._create_response(buildResponse(lambdaErrorJson['statusCode'], self.headers, body)) 
+                lambdaErrorJson = LambdaError(InternalServerError()).toDict()
+                body = buildLambdaBody(operation="NULL /forgotten", response=lambdaErrorJson)
+                return self._create_response(buildResponse(lambdaErrorJson['Error']['statusCode'], self.headers, body)) 
         return wrapper
     
     def _create_response(self, result: APIGatewayProxyResult):

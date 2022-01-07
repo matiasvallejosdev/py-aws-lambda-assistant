@@ -40,7 +40,7 @@ def buildResponse(operation, data: dict, eventHandler : EventHandler):
                 Body=buildBody(operation="NULL /forgotten", response=lambdaErrorJson['error'])
                 )    
 """
-def buildBody(operation, response):
+def buildLambdaBody(operation, response):
         return {
         'Operation': operation,
         'Response': json.dumps(response, sort_keys=True, default=str)

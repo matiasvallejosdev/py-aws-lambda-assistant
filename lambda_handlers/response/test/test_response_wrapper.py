@@ -61,7 +61,7 @@ class TestResponseBuilder:
         ],
     )
     def test_builder_body(self, operation, body, expected):
-        response = buildBody(operation, body)
+        response = buildLambdaBody(operation, body)
         
         assert response['Operation'] == operation
         assert response['Response'] == json.dumps(body)

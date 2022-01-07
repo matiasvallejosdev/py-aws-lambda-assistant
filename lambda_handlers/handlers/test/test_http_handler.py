@@ -15,13 +15,46 @@ logger.setLevel(logging.INFO)
 @HTTPHandler(headers=CORSHeaders(origin='*', credentials=True))
 def lambda_function(event, context):
     # Do something
-    return buildBody(event['routeKey'], event['result'])
-        
+    return buildLambdaBody(event['routeKey'], event['result'])
  
 class TestHttpHandler:
     @pytest.fixture
     def handler(self):
         return HTTPHandler(headers=CORSHeaders('*', True))
+    
+    @pytest.mark.parametrize(
+        'event, routeKey, bodyResponse',
+        [   # Here crash dict argument 'result' that decorator is expected
+            ({ 'routeKey': '/GET Error', 'resul': {}}, "NULL /forgotten", LambdaError(InternalServerError).toDict())        
+        ]   
+    )
+    def test_lambda_function_internal_error(self, handler, event, routeKey, bodyResponse):
+        http_response = lambda_function(event, context)
+   
+        body = buildLambdaBody(routeKey, bodyResponse)
+        
+        result = buildResponse(500, handler.headers, body)
+        expected = handler._create_response(result)
+        
+        assert http_response == expected
+        
+    @pytest.mark.parametrize(
+        'event, routeKey, bodyResponse',
+        [
+            ({ 'routeKey': '/GET Error', 'result': LambdaError(BadRequestError).toDict()}, "/GET Error", LambdaError(BadRequestError).toDict()),        
+            ({ 'routeKey': '/GET Error', 'result': LambdaError(NotFoundError).toDict()}, "/GET Error", LambdaError(NotFoundError).toDict())       
+        ]
+    )
+    def test_lambda_function_error(self, handler, event, routeKey, bodyResponse):
+        http_response = lambda_function(event, context)
+   
+        body = buildLambdaBody(routeKey, bodyResponse)
+        
+        statusCode = event['result']['Error']['statusCode']
+        result = buildResponse(statusCode, handler.headers, body)
+        expected = handler._create_response(result)
+        
+        assert http_response == expected
     
     @pytest.mark.parametrize(
         'event, routeKey, bodyResponse',
@@ -31,18 +64,18 @@ class TestHttpHandler:
             ({ 'routeKey': '/GET Tramites', 'result': {'Patente': 'AA00XX'}}, "/GET Tramites", {'Patente': 'AA00XX'})
         ]
     )
-    def test_lambda_function(self, handler, event, routeKey, bodyResponse):
+    def test_lambda_function_ok(self, handler, event, routeKey, bodyResponse):
         http_response = lambda_function(event, context)
    
-        body = buildBody(routeKey, bodyResponse)
+        body = buildLambdaBody(routeKey, bodyResponse)
         result = buildResponse(200, handler.headers, body)
         expected = handler._create_response(result)
         
         assert http_response == expected
     
     def test_create_response_error(self, handler: HTTPHandler):
-        lambdaErrorJson = LambdaError(BadRequestError()).toJson()
-        body = buildBody(operation="NULL /forgotten", response=lambdaErrorJson['Error']) 
+        lambdaErrorJson = LambdaError(BadRequestError()).toDict()
+        body = buildLambdaBody(operation="NULL /forgotten", response=lambdaErrorJson['Error']) 
         result = buildResponse(500, handler.headers, body)
         response = handler._create_response(result)
         
@@ -52,11 +85,11 @@ class TestHttpHandler:
         assert response == expected
         
     def test_create_response_ok(self, handler: HTTPHandler):
-        body = buildBody("GET", {})
+        body = buildLambdaBody("GET", {})
         result = buildResponse(200, handler.headers, body)
         response = handler._create_response(result)
         
-        expected = APIGatewayProxyResult(200, buildBody("GET", {}), handler._create_headers()).asjson()
+        expected = APIGatewayProxyResult(200, buildLambdaBody("GET", {}), handler._create_headers()).asjson()
         
         assert isinstance(response, str)
         assert response == expected
