@@ -17,9 +17,9 @@ This repository contains a python package that serves as a controller for AWS la
 
 - [Table of Contents](#table-of-contents)
 - [Installation](#installation)
-- [Examples](#examples:)
-    - [HTTP Handler](#http-handler:)
-    - [Lambda Errors](#lambda-errors:)
+- [Examples](#examples)
+    - [HTTP Handler](#http-handler)
+    - [Lambda Errors](#lambda-errors)
 - [Contributing](#contributing)
 - [Credits](#credits)
 - [Thanks](#thanks)
