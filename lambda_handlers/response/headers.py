@@ -8,12 +8,9 @@ class CORSHeaders:
 
     def buildHeaders(self):
         headers = {
-            'Headers': 
-            {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': self.origin
-            }
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': self.origin
         }
         if self.credentials:
-            headers['Access-Control-Allow-Origin'] = True
-        return headers['Headers']
+            headers['Access-Control-Allow-Credentials'] = True
+        return headers

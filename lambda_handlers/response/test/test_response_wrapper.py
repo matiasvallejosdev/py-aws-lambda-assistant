@@ -25,7 +25,7 @@ class TestResponseBuilder:
         [
             (
                 200,
-                CORSHeaders(),
+                CORSHeaders(origin='localhost', credentials=True),
                 {},
                 expected_builder()
             ),
@@ -41,8 +41,8 @@ class TestResponseBuilder:
         response = buildResponse(httpstatus, headers, body)
         assert isinstance(response, APIGatewayProxyResult)
         
-        response.Headers = CORSHeaders().buildHeaders()
-        expected.Headers = CORSHeaders().buildHeaders()
+        response.Headers = headers.buildHeaders()
+        expected.Headers = headers.buildHeaders()
         assert response == expected
         
         response = response.asdict()

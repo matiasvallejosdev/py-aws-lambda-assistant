@@ -31,8 +31,8 @@ class TestHttpHandler:
     def test_lambda_function_internal_error(self, handler, event, routeKey, bodyResponse):
         http_response = lambda_function(event, context)
    
+        # Build expected
         body = buildLambdaBody(routeKey, bodyResponse)
-        
         result = buildResponse(500, handler.headers, body)
         expected = handler._create_response(result)
         
@@ -47,13 +47,13 @@ class TestHttpHandler:
     )
     def test_lambda_function_error(self, handler, event, routeKey, bodyResponse):
         http_response = lambda_function(event, context)
-   
-        body = buildLambdaBody(routeKey, bodyResponse)
-        
+
+        # Build expected
+        body = buildLambdaBody(routeKey, bodyResponse)  
         statusCode = event['result']['Error']['statusCode']
         result = buildResponse(statusCode, handler.headers, body)
         expected = handler._create_response(result)
-        
+
         assert http_response == expected
     
     @pytest.mark.parametrize(
@@ -67,6 +67,7 @@ class TestHttpHandler:
     def test_lambda_function_ok(self, handler, event, routeKey, bodyResponse):
         http_response = lambda_function(event, context)
    
+        # Build expected
         body = buildLambdaBody(routeKey, bodyResponse)
         result = buildResponse(200, handler.headers, body)
         expected = handler._create_response(result)

@@ -46,7 +46,7 @@ class PutDataFailedError():
     _type = 'putDataFailedError'
 
 @dataclass
-class PutDataFailedError():
+class GetDataFailedError():
     _httpStatus = HTTPStatus.NOT_ACCEPTABLE.value
     _description = HTTPStatus.NOT_ACCEPTABLE.description
     _type = 'getDataFailedError'
