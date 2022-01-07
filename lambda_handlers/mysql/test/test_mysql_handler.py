@@ -2,8 +2,8 @@ import pytest
 import pymysql
 import json
 
-from lambda_handlers.handlers.mysql.mysql_client import *
-from lambda_handlers.handlers.lambda_handler import *
+from lambda_handlers.mysql.client_handler import *
+from lambda_handlers.handlers.event_handler import *
 
 PATH_JSON = r'C:\Users\matia\Desktop\Matias A. Vallejos\Github\Github.Work\MR-miregistro\miregistro-backend\src\backend\config\mysql_config.json'
 

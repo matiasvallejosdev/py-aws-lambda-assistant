@@ -1,26 +1,34 @@
 import json
 
-from lambda_handlers.handlers.lambda_handler import LambdaHandler
+from lambda_handlers.handlers.event_handler import EventHandler
 from lambda_handlers.errors import LambdaError, InternalServerError
-from lambda_handlers.response.headers import Headers
+from lambda_handlers.response.headers import CORSHeaders
 from lambda_handlers.types import APIGatewayProxyResult
 
 
-def buildResponse(operation, data: dict, lambdaHandler : LambdaHandler):
+def buildResponse(statusCode, headers: dict, body: dict):
+    return APIGatewayProxyResult(
+            HTTPStatus=statusCode, 
+            Headers=headers,
+            Body= body
+        )    
+"""
+def buildResponse(operation, data: dict, eventHandler : EventHandler):
+    headersHandler = headersHandler or Headers(origin='*', credentials=False)
     try:
-        if lambdaHandler.hasError():
-            lambdaErrorJson = lambdaHandler.lambdaError.toJson() 
+        if eventHandler.hasError():
+            lambdaErrorJson = eventHandler.lambdaError.toJson() 
             # If have a generic lambda error
             return APIGatewayProxyResult(
                 HTTPStatus=lambdaErrorJson['statusCode'], 
-                Headers=Headers().buildHeaders(), 
+                Headers=headersHandler.buildHeaders(), 
                 Body=buildBody(operation=operation, response=lambdaErrorJson['error'])
             )
         else:
             # If not have an lambda error
             return APIGatewayProxyResult(
                 HTTPStatus=200, 
-                Headers=Headers().buildHeaders(), 
+                Headers=headersHandler.buildHeaders(), 
                 Body=buildBody(operation=operation, response=data)
             )
     except:
@@ -28,10 +36,10 @@ def buildResponse(operation, data: dict, lambdaHandler : LambdaHandler):
         # If have an internal server error
         return APIGatewayProxyResult(
                 HTTPStatus=lambdaErrorJson['statusCode'], 
-                Headers=Headers().buildHeaders(), 
+                Headers=headersHandler.buildHeaders(), 
                 Body=buildBody(operation="NULL /forgotten", response=lambdaErrorJson['error'])
                 )    
-
+"""
 def buildBody(operation, response):
         return {
         'Operation': operation,

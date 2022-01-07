@@ -1,6 +1,6 @@
 from lambda_handlers.errors import *
 
-class LambdaHandler():
+class EventHandler():
     def __init__(self, event, context, lambdaError: LambdaError = None):
         self.event = event # event
         self.context = context # context

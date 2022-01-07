@@ -1,3 +1,3 @@
 # Handler classes
 
-from .lambda_handler import *
+from .event_handler import *

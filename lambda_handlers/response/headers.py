@@ -1,8 +1,7 @@
 import json
 
-class Headers:
+class CORSHeaders:
     """Return the data and the errors from validating `instance` against `schema`."""
-
     def __init__(self, origin: str = None, credentials: bool = False):
         self.origin = origin or '*'
         self.credentials = credentials
@@ -17,4 +16,4 @@ class Headers:
         }
         if self.credentials:
             headers['Access-Control-Allow-Origin'] = True
-        return headers
+        return headers['Headers']

@@ -21,4 +21,5 @@ class APIGatewayProxyResult:
             "HTTPStatus": self.HTTPStatus,
             "Headers": self.Headers,
             "Body": json.dumps(self.Body)
-        }, indent= 3)
+        }, 
+        indent= 4)

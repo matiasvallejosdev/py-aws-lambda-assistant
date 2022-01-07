@@ -11,8 +11,8 @@ class LambdaError():
 
     def toJson(self):
         return {
-            'statusCode': self.statusCode,
-            'error': {
+            'Error': {
+                'statusCode': self.statusCode,
                 'message': self.message,
                 'type': self.type
             }
