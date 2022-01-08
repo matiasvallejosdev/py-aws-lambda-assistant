@@ -12,34 +12,7 @@ def buildResponse(statusCode, headers: dict, body: dict):
             Headers=headers,
             Body= body
         )    
-"""
-def buildResponse(operation, data: dict, eventHandler : EventHandler):
-    headersHandler = headersHandler or Headers(origin='*', credentials=False)
-    try:
-        if eventHandler.hasError():
-            lambdaErrorJson = eventHandler.lambdaError.toJson() 
-            # If have a generic lambda error
-            return APIGatewayProxyResult(
-                HTTPStatus=lambdaErrorJson['statusCode'], 
-                Headers=headersHandler.buildHeaders(), 
-                Body=buildBody(operation=operation, response=lambdaErrorJson['error'])
-            )
-        else:
-            # If not have an lambda error
-            return APIGatewayProxyResult(
-                HTTPStatus=200, 
-                Headers=headersHandler.buildHeaders(), 
-                Body=buildBody(operation=operation, response=data)
-            )
-    except:
-        lambdaErrorJson = LambdaError(InternalServerError()).toJson()
-        # If have an internal server error
-        return APIGatewayProxyResult(
-                HTTPStatus=lambdaErrorJson['statusCode'], 
-                Headers=headersHandler.buildHeaders(), 
-                Body=buildBody(operation="NULL /forgotten", response=lambdaErrorJson['error'])
-                )    
-"""
+
 def buildLambdaBody(operation, response):
         return {
         'Operation': operation,
