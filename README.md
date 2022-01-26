@@ -101,7 +101,7 @@ error = error.asDict()
 ```python
 print(error) # -> LambdaError(InternalServerError()).asDict()
 ```
-If you print your lambda error dictionary you can get the following results.
+If you print your lambda error dictionary you can get the following results. This results will be performed by the lambda wrapper and also you can send 'Error' attribute to the body in the response.
 ```python
 {
     'Error': {
