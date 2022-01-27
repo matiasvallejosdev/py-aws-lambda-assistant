@@ -1,4 +1,4 @@
-<h1 align="center"> Python Lambda Handler </h1>
+<h1 align="center"> Lambda Assistant </h1>
   <div align="center">
 
   [![GitHub release (latest by date)](https://img.shields.io/github/v/release/matiasvallejosdev/py-aws-lambda-handlers?color=4cc51e)](https://github.com/matiasvallejosdev/py-aws-lambda-handlers)
