@@ -35,7 +35,7 @@ class TestHttpHandler:
         result = buildResponse(500, handler.headers, body)
         expected = handler._create_response(result)
         
-        assert http_response == expected
+        assert http_response['statusCode'] == expected['statusCode']
         
     @pytest.mark.parametrize(
         'event, routeKey, bodyResponse',

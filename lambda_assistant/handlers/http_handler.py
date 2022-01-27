@@ -32,7 +32,7 @@ class HTTPHandler():
                     return self._create_response(buildResponse(200, self.headers, body))          
             except Exception as e:
                 # If have an internal server error
-                lambdaErrorJson = LambdaError(InternalServerError()).toDict()
+                lambdaErrorJson = LambdaError(InternalServerError, e).toDict()
                 logger.error(e)
                 body = buildBody(operation="NULL /forgotten", response=lambdaErrorJson)
                 return self._create_response(buildResponse(lambdaErrorJson['Error']['statusCode'], self.headers, body)) 
