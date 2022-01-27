@@ -2,9 +2,9 @@ from typing import NewType
 import pytest
 import logging
 
-from lambda_handlers.errors import *
-from lambda_handlers.handlers.event_handler import *
-from lambda_handlers.handlers.http_handler import *
+from lambda_assistant.errors import *
+from lambda_assistant.handlers.event_handler import *
+from lambda_assistant.handlers.http_handler import *
 
 context = NewType('LambdaContext', object)
 
@@ -14,7 +14,6 @@ logger.setLevel(logging.INFO)
 # To test lambda function
 @HTTPHandler(headers=CORSHeaders(origin='*', credentials=True))
 def lambda_function(event, context):
-    # Do something
     return buildLambdaBody(event['routeKey'], event['result'])
  
 class TestHttpHandler:
@@ -75,24 +74,26 @@ class TestHttpHandler:
         assert http_response == expected
     
     def test_create_response_error(self, handler: HTTPHandler):
-        lambdaErrorJson = LambdaError(BadRequestError()).toDict()
+        lambdaErrorJson = LambdaError(BadRequestError()).toDict()    
         body = buildLambdaBody(operation="NULL /forgotten", response=lambdaErrorJson['Error']) 
-        result = buildResponse(500, handler.headers, body)
-        response = handler._create_response(result)
         
-        expected = APIGatewayProxyResult(500, body, handler._create_headers()).asjson()
+        result = buildResponse(500, handler.headers, body)   
+        response = handler._create_response(result)     
         
-        assert isinstance(response, str)
+        expected = APIGatewayProxyResult(500, body, handler._create_headers()).toDict()
+        
+        assert isinstance(response, dict)
         assert response == expected
         
     def test_create_response_ok(self, handler: HTTPHandler):
         body = buildLambdaBody("GET", {})
+        
         result = buildResponse(200, handler.headers, body)
         response = handler._create_response(result)
         
-        expected = APIGatewayProxyResult(200, buildLambdaBody("GET", {}), handler._create_headers()).asjson()
+        expected = APIGatewayProxyResult(200, buildLambdaBody("GET", {}), handler._create_headers()).toDict()
         
-        assert isinstance(response, str)
+        assert isinstance(response, dict)
         assert response == expected
         
     

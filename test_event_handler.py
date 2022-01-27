@@ -1,5 +1,5 @@
-from lambda_handlers.errors import *
-from lambda_handlers.handlers.event_handler import *
+from lambda_assistant.errors import *
+from lambda_assistant.handlers.event_handler import *
 
 PATH_JSON = r'C:\Users\matia\Desktop\Matias A. Vallejos\Github\Github.Work\MR-miregistro\miregistro-backend\src\backend\config\mysql_config.json'
 

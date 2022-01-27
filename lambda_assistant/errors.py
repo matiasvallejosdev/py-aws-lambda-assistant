@@ -1,6 +1,5 @@
 # Class lambda error to manage common errors in execution time
 from dataclasses import dataclass
-import json
 from http import HTTPStatus
 
 class LambdaError():
@@ -28,6 +27,12 @@ class InternalServerError():
     _type = 'internalServerError'
     
 @dataclass
+class PreconditionRequiredError():
+    _httpStatus = HTTPStatus.PRECONDITION_REQUIRED.value
+    _description = HTTPStatus.PRECONDITION_REQUIRED.description
+    _type = 'preconditionRequiredError'
+    
+@dataclass
 class BadRequestError():
     _httpStatus = HTTPStatus.BAD_REQUEST.value
     _description = HTTPStatus.BAD_REQUEST.description
@@ -47,8 +52,8 @@ class PutDataFailedError():
 
 @dataclass
 class GetDataFailedError():
-    _httpStatus = HTTPStatus.NOT_ACCEPTABLE.value
-    _description = HTTPStatus.NOT_ACCEPTABLE.description
+    _httpStatus = HTTPStatus.CONFLICT.value
+    _description = HTTPStatus.CONFLICT.description
     _type = 'getDataFailedError'
 
 @dataclass

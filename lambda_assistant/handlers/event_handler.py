@@ -1,4 +1,4 @@
-from lambda_handlers.errors import *
+from lambda_assistant.errors import LambdaError
 
 class EventHandler():
     def __init__(self, event, context, lambdaError: LambdaError = None):

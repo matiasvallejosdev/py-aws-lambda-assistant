@@ -1,4 +1,3 @@
-import json
 
 class CORSHeaders:
     """Return the data and the errors from validating `instance` against `schema`."""

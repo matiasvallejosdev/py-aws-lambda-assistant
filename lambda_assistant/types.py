@@ -11,15 +11,10 @@ class APIGatewayProxyResult:
     Body: Union[str, Dict[str, Any]]
     Headers: Optional[Headers] = None
 
-    def asdict(self) -> Dict[str, Any]:
-        #Convert self into a dict.
-        return {k: v for k, v in asdict(self).items() if v is not None}
-        
-    def asjson(self):
+    def toDict(self):
         #Convert self into a json response
-        return json.dumps({
-            "HTTPStatus": self.HTTPStatus,
-            "Headers": self.Headers,
-            "Body": json.dumps(self.Body)
-        }, 
-        indent= 4)
+        return {
+            'statusCode': self.HTTPStatus,
+            'headers': self.Headers,
+            'body': json.dumps(self.Body)
+        }

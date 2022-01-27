@@ -1,6 +1,6 @@
 
 from typing import Tuple
-from lambda_handlers.response.wrapper import *
+from lambda_assistant.response.wrapper import *
 
 class Query():
     def __init__(self, base_query: str = None):
