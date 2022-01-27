@@ -26,7 +26,8 @@ class TestEventHandler:
         assert eventHandler.lambdaError.toDict() == {
             'Error': {
                 'statusCode': 400,
-                'message': "Bad request syntax or unsupported method",
+                'message': '',
+                'description': 'Bad request syntax or unsupported method',
                 'type': 'badRequestError'
             }
         }

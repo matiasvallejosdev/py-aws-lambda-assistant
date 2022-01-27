@@ -13,19 +13,19 @@ class Config(object):
     
     @staticmethod 
     def GetDbConfig(path=None) -> dict:
-        """ Return JSON configuration file """
-        if rds_host is not None:
-            return{
-                'db_host': rds_host,
-                'db_user': db_username,
-                'db_pass': db_password,
-                'db_name': db_name 
-            }
-        else:
-            if path is not None:     
+        try:
+            """ Return JSON configuration file """
+            if path is None:
+                return{
+                    'db_host': rds_host,
+                    'db_user': db_username,
+                    'db_pass': db_password,
+                    'db_name': db_name 
+                }
+            else:
                 with open(path) as f:
                     config = json.load(f)
                 return config
-            else:
+        except:
                 return {}
         

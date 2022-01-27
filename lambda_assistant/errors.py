@@ -3,16 +3,18 @@ from dataclasses import dataclass
 from http import HTTPStatus
 
 class LambdaError():
-    def __init__(self, error):
+    def __init__(self, error, message = None):
         self.statusCode = error._httpStatus
         self.type = error._type
-        self.message = error._description
+        self.message = message or ""
+        self.description = error._description
 
     def toDict(self):
         return {
             'Error': {
                 'statusCode': self.statusCode,
                 'message': self.message,
+                'description': self.description,
                 'type': self.type
             }
         }
