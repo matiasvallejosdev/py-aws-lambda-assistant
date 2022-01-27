@@ -7,7 +7,7 @@ from lambda_assistant.errors import *
 from lambda_assistant.handlers.event_handler import EventHandler
 from lambda_assistant.response import headers
 from lambda_assistant.response.headers import CORSHeaders
-from lambda_assistant.response.wrapper import buildResponse, buildLambdaBody
+from lambda_assistant.response.wrapper import buildResponse, buildBody
 from lambda_assistant.types import APIGatewayProxyResult
 
 logger = logging.getLogger()
@@ -23,9 +23,9 @@ class HTTPHandler():
                 body = func(*args, **kwargs) # body -> dict
                 print(body)
                 
-                if 'Error' in json.loads(body['Response']):
+                if 'Error' in json.loads(body['response']):
                     # If has lambda error
-                    lambdaErrorJson = json.loads(body['Response'])
+                    lambdaErrorJson = json.loads(body['response'])
                     return self._create_response(buildResponse(lambdaErrorJson['Error']['statusCode'], self.headers, body))
                 if body is not None:
                     # If has OK
@@ -34,7 +34,7 @@ class HTTPHandler():
                 # If have an internal server error
                 lambdaErrorJson = LambdaError(InternalServerError()).toDict()
                 logger.error(e)
-                body = buildLambdaBody(operation="NULL /forgotten", response=lambdaErrorJson)
+                body = buildBody(operation="NULL /forgotten", response=lambdaErrorJson)
                 return self._create_response(buildResponse(lambdaErrorJson['Error']['statusCode'], self.headers, body)) 
         return wrapper
     

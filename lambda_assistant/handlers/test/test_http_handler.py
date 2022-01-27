@@ -14,7 +14,7 @@ logger.setLevel(logging.INFO)
 # To test lambda function
 @HTTPHandler(headers=CORSHeaders(origin='*', credentials=True))
 def lambda_function(event, context):
-    return buildLambdaBody(event['routeKey'], event['result'])
+    return buildBody(event['routeKey'], event['result'])
  
 class TestHttpHandler:
     @pytest.fixture
@@ -31,7 +31,7 @@ class TestHttpHandler:
         http_response = lambda_function(event, context)
    
         # Build expected
-        body = buildLambdaBody(routeKey, bodyResponse)
+        body = buildBody(routeKey, bodyResponse)
         result = buildResponse(500, handler.headers, body)
         expected = handler._create_response(result)
         
@@ -48,7 +48,7 @@ class TestHttpHandler:
         http_response = lambda_function(event, context)
 
         # Build expected
-        body = buildLambdaBody(routeKey, bodyResponse)  
+        body = buildBody(routeKey, bodyResponse)  
         statusCode = event['result']['Error']['statusCode']
         result = buildResponse(statusCode, handler.headers, body)
         expected = handler._create_response(result)
@@ -67,7 +67,7 @@ class TestHttpHandler:
         http_response = lambda_function(event, context)
    
         # Build expected
-        body = buildLambdaBody(routeKey, bodyResponse)
+        body = buildBody(routeKey, bodyResponse)
         result = buildResponse(200, handler.headers, body)
         expected = handler._create_response(result)
         
@@ -75,7 +75,7 @@ class TestHttpHandler:
     
     def test_create_response_error(self, handler: HTTPHandler):
         lambdaErrorJson = LambdaError(BadRequestError()).toDict()    
-        body = buildLambdaBody(operation="NULL /forgotten", response=lambdaErrorJson['Error']) 
+        body = buildBody(operation="NULL /forgotten", response=lambdaErrorJson['Error']) 
         
         result = buildResponse(500, handler.headers, body)   
         response = handler._create_response(result)     
@@ -86,12 +86,12 @@ class TestHttpHandler:
         assert response == expected
         
     def test_create_response_ok(self, handler: HTTPHandler):
-        body = buildLambdaBody("GET", {})
+        body = buildBody("GET", {})
         
         result = buildResponse(200, handler.headers, body)
         response = handler._create_response(result)
         
-        expected = APIGatewayProxyResult(200, buildLambdaBody("GET", {}), handler._create_headers()).toDict()
+        expected = APIGatewayProxyResult(200, buildBody("GET", {}), handler._create_headers()).toDict()
         
         assert isinstance(response, dict)
         assert response == expected

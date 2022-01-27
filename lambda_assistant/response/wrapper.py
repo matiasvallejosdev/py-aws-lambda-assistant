@@ -12,9 +12,9 @@ def buildResponse(statusCode, headers: dict, body: dict):
             Body= body
         )    
     
-def buildLambdaBody(operation, response):
+def buildBody(operation, response):
         return {
-        'Operation': operation,
-        'Response': json.dumps(response, sort_keys=True, default=str)
+        'operationResource': operation,
+        'response': json.dumps(response, default=str)
         }
         

@@ -13,7 +13,7 @@ def expected_builder(code = 200):
                 Body={})
 
     
-class TestResponseBuilder:
+class TestresponseBuilder:
 
     @pytest.mark.parametrize(
         'httpstatus, headers, body, expected',
@@ -50,13 +50,13 @@ class TestResponseBuilder:
     @pytest.mark.parametrize(
         'operation, body, expected',
         [
-            ("GET", {}, {'Operation': "GET", 'Response': json.dumps({})}),
-            ("POST", {}, {'Operation': "POST", 'Response': json.dumps({})})
+            ("GET", {}, {'operationResource': "GET", 'response': json.dumps({})}),
+            ("POST", {}, {'operationResource': "POST", 'response': json.dumps({})})
         ],
     )
     def test_builder_body(self, operation, body, expected):
-        response = buildLambdaBody(operation, body)
+        response = buildBody(operation, body)
         
-        assert response['Operation'] == operation
-        assert response['Response'] == json.dumps(body)
+        assert response['operationResource'] == operation
+        assert response['response'] == json.dumps(body)
         assert response == expected
