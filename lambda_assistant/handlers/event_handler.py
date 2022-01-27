@@ -11,5 +11,5 @@ class EventHandler():
             return False
         return True
         
-    def performError(self, error):
-        self.lambdaError = LambdaError(error)
+    def performError(self, error, message = None):
+        self.lambdaError = LambdaError(error, message)
