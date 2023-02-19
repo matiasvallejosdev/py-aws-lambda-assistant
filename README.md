@@ -13,25 +13,7 @@
 This repository contains a python package that serves as a controller for AWS lambda functions, including http output handler, input validation, error handling, and response formatting.
 <p/>
 
-## Table of Contents
-
-- [Table of Contents](#table-of-contents)
-- [Installation](#installation)
-- [Examples](#examples)
-    - [HTTP Handler](#http-handler)
-    - [Lambda Errors](#lambda-errors)
-- [Contributing](#contributing)
-- [Credits](#credits)
-- [Thanks](#thanks)
-
-## Installation
-　1. Clone a repository or download it as zip.
-```
-    git clone https://github.com/matiasvallejosdev/unity-tensorflow-image-classifier
-```
-
-## Examples:
-### HTTP handler
+## HTTP handler
 
 Now you perform your result with ```buildLambdaBody(route, response)``` and ```HTTPHandler``` performs your Headers with CORS and also perform Body with your errors response and HTTPs status codes.
 
@@ -67,7 +49,7 @@ cat response.json
     "body": "{\"message\": \"Hello World from lambda function!\"}"
 }
 ```
-### Lambda errors
+## HTTP Error
 You can construct your own errors using the father class ```LambdaError()``` with a ```CustomHttpError()``` _-> @dataclass_ that can help you in your http response body.
 
 ```python
@@ -112,19 +94,6 @@ If you print your lambda error dictionary you can get the following results. Thi
 }
 ```
 
-## Contributing
-
-Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are greatly appreciated. <br /><br />
-　1.　Fork the Project. <br />
-　2.　Create your Feature Branch. <br />
-　3.　Commit your Changes. <br />
-　4.　Push to the Branch. <br />
-　5.　Open a Pull Request. <br />
-
-## Credits
-
-- Main Developer: [Matias A. Vallejos](https://www.linkedin.com/in/matiasvallejos/)
-
 ## Thanks
 
-_For more information about the project contact me! Do not hesitate to write me just do it!_
+_For more information about the project contact me! Do not hesitate to write me just do it!_ [Matias Vallejos](https://www.linkedin.com/in/matiasvallejos/)
